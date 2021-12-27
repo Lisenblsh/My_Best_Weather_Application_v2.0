@@ -22,6 +22,7 @@ import com.example.mybestweatherapplicationv20.retrofit.Constrains
 import com.example.mybestweatherapplicationv20.viewmodel.WeatherViewModel
 import com.github.florent37.viewanimator.ViewAnimator
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.Exception
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -49,8 +50,9 @@ class WeatherFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         currentWeatherViewModel()
-        swipeUpdate()
-        searchCity()
+            swipeUpdate()
+            searchCity()
+
     }
 
     @SuppressLint("SetTextI18n")

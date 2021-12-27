@@ -36,11 +36,12 @@ class SplashScreenActivity : AppCompatActivity() {
                     .readText()
             } catch (e: Exception) {
                 null
+
             }
             return response
         }
 
-        override fun onPostExecute(result: String) {
+        override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
             try{
                 val json = JSONObject(result).getString("city")

@@ -3,7 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/AndroidSProg/My_Best_Weather_Application_v2.0/app/src/main/res/layout/fragment_weather.xml" value="0.2" />
+        <entry key="..\:/AndroidSProg/My_Best_Weather_Application_v2.0/app/src/main/res/layout/activity_main.xml" value="0.14375" />
+        <entry key="..\:/AndroidSProg/My_Best_Weather_Application_v2.0/app/src/main/res/layout/fragment_weather.xml" value="0.136" />
         <entry key="..\:/remote/francinshtein/MyBestWeatherApplicationv20/app/src/main/res/drawable/splash_background.xml" value="0.19316239316239317" />
         <entry key="..\:/remote/francinshtein/MyBestWeatherApplicationv20/app/src/main/res/drawable/splash_background_night.xml" value="0.1893162393162393" />
         <entry key="..\:/remote/francinshtein/MyBestWeatherApplicationv20/app/src/main/res/layout/activity_main.xml" value="0.25" />
