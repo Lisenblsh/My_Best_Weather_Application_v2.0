@@ -74,8 +74,7 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
-                    <RelativeLayout
-                        android:id="@+id/updContainer"
+                    <RelativeLayout android:id="@+id/updContainer"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:alpha="0"
@@ -186,20 +185,18 @@
 
                     <Space
                         android:layout_width="match_parent"
-                        android:layout_height="50dp" />
+                        android:layout_height="25dp" />
 
-                    <TextView
-                        android:id="@+id/errorText"
+                    <TextView android:id="@+id/errorText"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="25dp"
                         android:layout_centerVertical="true"
                         android:gravity="center"
                         android:text="@string/no_internet"
                         android:textSize="18dp"
-                        android:visibility="gone" />
+                        android:visibility="invisible" />
 
-                    <RelativeLayout
-                        android:id="@+id/mainContainer"
+                    <RelativeLayout android:id="@+id/mainContainer"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:alpha="0"
@@ -268,8 +265,7 @@
 
                     </RelativeLayout>
 
-                    <RelativeLayout
-                        android:id="@+id/secondContainer"
+                    <RelativeLayout android:id="@+id/secondContainer"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:alpha="0"

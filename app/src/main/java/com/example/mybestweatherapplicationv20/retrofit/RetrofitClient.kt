@@ -14,6 +14,7 @@ object RetrofitClient {
     @Provides
     fun provideBaseUrl() = Constrains.BASE_URL
 
+
     @Provides
     @Singleton
     fun provideRetrofitInstance(BASE_URL:String): RetrofitService =

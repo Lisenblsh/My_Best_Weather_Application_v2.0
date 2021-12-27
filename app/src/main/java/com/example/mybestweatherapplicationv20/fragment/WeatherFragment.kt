@@ -22,7 +22,7 @@ import com.example.mybestweatherapplicationv20.retrofit.Constrains
 import com.example.mybestweatherapplicationv20.viewmodel.WeatherViewModel
 import com.github.florent37.viewanimator.ViewAnimator
 import dagger.hilt.android.AndroidEntryPoint
-import java.lang.Exception
+import retrofit2.Retrofit
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -50,9 +50,8 @@ class WeatherFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         currentWeatherViewModel()
-            swipeUpdate()
-            searchCity()
-
+        swipeUpdate()
+        searchCity()
     }
 
     @SuppressLint("SetTextI18n")
@@ -75,7 +74,7 @@ class WeatherFragment : Fragment() {
                 val pressure = currentWeather.main.pressure
 
                 val cityTimeZone = currentWeather.timezone
-                val sunriseInt =  currentWeather.sys.sunrise
+                val sunriseInt = currentWeather.sys.sunrise
                 val sunsetInt = currentWeather.sys.sunset
                 val sunrise = getTimeSunriseSunset(sunriseInt, cityTimeZone)
                 val sunset = getTimeSunriseSunset(sunsetInt, cityTimeZone)
@@ -88,11 +87,12 @@ class WeatherFragment : Fragment() {
                     imgSun.visibility = View.GONE
                 }
 
-                val weatherDescription = currentWeather.weather.first().description.replaceFirstChar {
-                    if (it.isLowerCase()) it.titlecase(
-                        Locale.getDefault()
-                    ) else it.toString()
-                }
+                val weatherDescription =
+                    currentWeather.weather.first().description.replaceFirstChar {
+                        if (it.isLowerCase()) it.titlecase(
+                            Locale.getDefault()
+                        ) else it.toString()
+                    }
                 weatherIcon += currentWeather.weather.first().id
 
                 //Вывод
@@ -100,7 +100,8 @@ class WeatherFragment : Fragment() {
                 binding.maxTemp.text = "Максимум: $maxTemp°C"
                 binding.minTemp.text = "Минимум: $minTemp°C"
                 binding.feelsLike.text = "Ощущается как $tempFeelsLike°C"
-                binding.updateAt.text = "${currentWeather.name}, ${getDateUpdate(currentWeather.dt)}"
+                binding.updateAt.text =
+                    "${currentWeather.name}, ${getDateUpdate(currentWeather.dt)}"
                 binding.windDeg.text = windDegText
                 binding.windSpeed.text = "$windSpeed м/с"
                 binding.humidity.text = "${humidity}%"
@@ -157,24 +158,33 @@ class WeatherFragment : Fragment() {
                         binding.imgForecast5,
                         binding.imgForecast6
                     )
-                val cityTimeZone = forecastWeather.city.timezone*1000
+                val cityTimeZone = forecastWeather.city.timezone * 1000
                 for (i in 0..5) {
                     val weatherIcon = listOfWeather[i]?.values?.first()
                     listOfTimeView[i].text = getTimeForecast(listWeather[i].dtTxt, cityTimeZone)
-                    listOfTempView[i].text = "${listOfWeather[i]?.keys?.first()?.tempMax?.roundToInt()}°C/${listOfWeather[1]?.keys?.first()?.tempMin?.roundToInt()}°C"
+                    listOfTempView[i].text =
+                        "${listOfWeather[i]?.keys?.first()?.tempMax?.roundToInt()}°C/${listOfWeather[1]?.keys?.first()?.tempMin?.roundToInt()}°C"
                     listOfImageView[i].setImageURI(Uri.parse("android.resource://${activity?.packageName}/drawable/d$weatherIcon"))
                 }
             }
         })
     }
 
-    private fun swipeUpdate(){
+    private fun swipeUpdate() {
         val swipeRefreshLayout = binding.swipeRefresh
         swipeRefreshLayout.setOnRefreshListener {
-            viewModel.updateData()
-            Handler().postDelayed({
+            isOnline(requireContext())
+            if (!NoInternet.noInternet) {
+                viewModel.updateData()
+                noInternet()
+                Handler().postDelayed({
+                    swipeRefreshLayout.isRefreshing = false
+                }, 600)
+            }else {
+                noInternet()
                 swipeRefreshLayout.isRefreshing = false
-            }, 600)
+
+            }
         }
     }
 
@@ -182,12 +192,19 @@ class WeatherFragment : Fragment() {
         binding.cityText.setOnEditorActionListener { _, actionId, _ ->
             return@setOnEditorActionListener when (actionId) {
                 EditorInfo.IME_ACTION_SEARCH -> {
+                    isOnline(requireContext())
+                    if (!NoInternet.noInternet) {
                         Constrains.city = binding.cityText.text.toString().trim()
                         viewModel.updateData()
-                        binding.cityText.setText("")
-                        val imm: InputMethodManager =
-                            activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+                        noInternet()
+                    } else {
+                        noInternet()
+
+                    }
+                    binding.cityText.setText("")
+                    val imm: InputMethodManager =
+                        activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
                     true
                 }
                 else -> false
@@ -195,12 +212,12 @@ class WeatherFragment : Fragment() {
         }
     }
 
-    private fun animation(){
+    private fun animation() {
         ViewAnimator.animate(binding.loadScene).duration(2500).translationX(1000f).alpha(0f).start()
         ViewAnimator.animate(binding.colorLayout).duration(2500).alpha(0.1f).start()
-        ViewAnimator.animate(binding.secondContainer).duration(1800).translationX(30f).alpha(0f,1f)
+        ViewAnimator.animate(binding.secondContainer).duration(1800).translationX(30f).alpha(0f, 1f)
             .thenAnimate(binding.secondContainer).duration(200).translationX(0f).start()
-        ViewAnimator.animate(binding.sunMoon).duration(1800).translationX(30f).alpha(0f,1f)
+        ViewAnimator.animate(binding.sunMoon).duration(1800).translationX(30f).alpha(0f, 1f)
             .thenAnimate(binding.sunMoon).duration(200).translationX(0f).start()
         ViewAnimator.animate(binding.mainContainer).duration(1400).translationX(35f).alpha(1f)
             .thenAnimate(binding.mainContainer).duration(200).translationX(0f).start()
@@ -210,6 +227,16 @@ class WeatherFragment : Fragment() {
             .thenAnimate(binding.bgForImg).duration(200).translationX(0f).start()
     }
 
-
+    private fun noInternet() {
+        if(!NoInternet.noInternet) {
+            binding.apply {
+                errorText.visibility = View.INVISIBLE
+            }
+        } else {
+            binding.apply {
+                errorText.visibility = View.VISIBLE
+            }
+        }
+    }
 
 }
