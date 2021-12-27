@@ -22,7 +22,6 @@ import com.example.mybestweatherapplicationv20.retrofit.Constrains
 import com.example.mybestweatherapplicationv20.viewmodel.WeatherViewModel
 import com.github.florent37.viewanimator.ViewAnimator
 import dagger.hilt.android.AndroidEntryPoint
-import retrofit2.Retrofit
 import java.util.*
 import kotlin.math.roundToInt
 
