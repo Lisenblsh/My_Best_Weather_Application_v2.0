@@ -106,7 +106,7 @@ class WeatherFragment : Fragment() {
                 binding.sunrise.text = sunrise
                 binding.sunset.text = sunset
                 binding.weatherImage.setImageURI(Uri.parse("android.resource://${activity?.packageName}/drawable/$weatherIcon"))
-                binding.weatherImageOutLine.setImageURI(Uri.parse("android.resource://${activity?.packageName}/drawable/d$weatherIcon"))
+                binding.weatherImageOutLine.setImageURI(Uri.parse("android.resource://${activity?.packageName}/drawable/$weatherIcon"))
                 binding.weatherDescription.text = weatherDescription
 
                 forecastWeatherViewModel()
