@@ -34,8 +34,13 @@ class WeatherFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        isOnline(requireContext())
         Handler().postDelayed({
-            animation()
+            if (!NoInternet.noInternet) {
+                animation()
+            } else {
+                noInternet()
+            }
         }, 2000)
     }
 
@@ -57,64 +62,66 @@ class WeatherFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun currentWeatherViewModel() {
 
-        viewModel.currentWeatherResp.observe(viewLifecycleOwner, { currentWeather ->
-            binding.apply {
-                val temp = currentWeather.main.temp.roundToInt()
-                val tempFeelsLike = currentWeather.main.feelsLike.roundToInt()
-                val colorCode = getColorForBG(tempFeelsLike)
-                binding.colorLayout.setBackgroundColor(Color.parseColor("#$colorCode"))
-                binding.bgForImg.setBackgroundColor(Color.parseColor("#$colorCode"))
-                binding.colorDetailsBg.setBackgroundColor(Color.parseColor("#4a$colorCode"))
+       if(!NoInternet.noInternet) {
+            viewModel.currentWeatherResp.observe(viewLifecycleOwner, { currentWeather ->
+                binding.apply {
+                    val temp = currentWeather.main.temp.roundToInt()
+                    val tempFeelsLike = currentWeather.main.feelsLike.roundToInt()
+                    val colorCode = getColorForBG(tempFeelsLike)
+                    binding.colorLayout.setBackgroundColor(Color.parseColor("#$colorCode"))
+                    binding.bgForImg.setBackgroundColor(Color.parseColor("#$colorCode"))
+                    binding.colorDetailsBg.setBackgroundColor(Color.parseColor("#4a$colorCode"))
 
-                val maxTemp = currentWeather.main.tempMax.roundToInt()
-                val minTemp = currentWeather.main.tempMin.roundToInt()
-                val windDegText = getWindDeg(currentWeather.wind.deg)
-                val windSpeed = currentWeather.wind.speed.roundToInt()
-                val humidity = currentWeather.main.humidity
-                val pressure = currentWeather.main.pressure
+                    val maxTemp = currentWeather.main.tempMax.roundToInt()
+                    val minTemp = currentWeather.main.tempMin.roundToInt()
+                    val windDegText = getWindDeg(currentWeather.wind.deg)
+                    val windSpeed = currentWeather.wind.speed.roundToInt()
+                    val humidity = currentWeather.main.humidity
+                    val pressure = currentWeather.main.pressure
 
-                val cityTimeZone = currentWeather.timezone
-                val sunriseInt = currentWeather.sys.sunrise
-                val sunsetInt = currentWeather.sys.sunset
-                val sunrise = getTimeSunriseSunset(sunriseInt, cityTimeZone)
-                val sunset = getTimeSunriseSunset(sunsetInt, cityTimeZone)
-                var weatherIcon = getImageForBG(cityTimeZone, sunriseInt, sunsetInt)
-                if (weatherIcon == "d") {
-                    imgSun.visibility = View.VISIBLE
-                    imgMoon.visibility = View.GONE
-                } else {
-                    imgMoon.visibility = View.VISIBLE
-                    imgSun.visibility = View.GONE
-                }
-
-                val weatherDescription =
-                    currentWeather.weather.first().description.replaceFirstChar {
-                        if (it.isLowerCase()) it.titlecase(
-                            Locale.getDefault()
-                        ) else it.toString()
+                    val cityTimeZone = currentWeather.timezone
+                    val sunriseInt = currentWeather.sys.sunrise
+                    val sunsetInt = currentWeather.sys.sunset
+                    val sunrise = getTimeSunriseSunset(sunriseInt, cityTimeZone)
+                    val sunset = getTimeSunriseSunset(sunsetInt, cityTimeZone)
+                    var weatherIcon = getImageForBG(cityTimeZone, sunriseInt, sunsetInt)
+                    if (weatherIcon == "d") {
+                        imgSun.visibility = View.VISIBLE
+                        imgMoon.visibility = View.GONE
+                    } else {
+                        imgMoon.visibility = View.VISIBLE
+                        imgSun.visibility = View.GONE
                     }
-                weatherIcon += currentWeather.weather.first().id
 
-                //Вывод
-                binding.temp.text = "$temp°C"
-                binding.maxTemp.text = "Максимум: $maxTemp°C"
-                binding.minTemp.text = "Минимум: $minTemp°C"
-                binding.feelsLike.text = "Ощущается как $tempFeelsLike°C"
-                binding.updateAt.text =
-                    "${currentWeather.name}, ${getDateUpdate(currentWeather.dt)}"
-                binding.windDeg.text = windDegText
-                binding.windSpeed.text = "$windSpeed м/с"
-                binding.humidity.text = "${humidity}%"
-                binding.pressure.text = "$pressure гПа"
-                binding.sunrise.text = sunrise
-                binding.sunset.text = sunset
-                binding.weatherImage.setImageURI(Uri.parse("android.resource://${activity?.packageName}/drawable/$weatherIcon"))
-                binding.weatherImageOutLine.setImageURI(Uri.parse("android.resource://${activity?.packageName}/drawable/$weatherIcon"))
-                binding.weatherDescription.text = weatherDescription
+                    val weatherDescription =
+                        currentWeather.weather.first().description.replaceFirstChar {
+                            if (it.isLowerCase()) it.titlecase(
+                                Locale.getDefault()
+                            ) else it.toString()
+                        }
+                    weatherIcon += currentWeather.weather.first().id
 
-                forecastWeatherViewModel()
-            }
-        })
+                    //Вывод
+                    binding.temp.text = "$temp°C"
+                    binding.maxTemp.text = "Максимум: $maxTemp°C"
+                    binding.minTemp.text = "Минимум: $minTemp°C"
+                    binding.feelsLike.text = "Ощущается как $tempFeelsLike°C"
+                    binding.updateAt.text =
+                        "${currentWeather.name}, ${getDateUpdate(currentWeather.dt)}"
+                    binding.windDeg.text = windDegText
+                    binding.windSpeed.text = "$windSpeed м/с"
+                    binding.humidity.text = "${humidity}%"
+                    binding.pressure.text = "$pressure гПа"
+                    binding.sunrise.text = sunrise
+                    binding.sunset.text = sunset
+                    binding.weatherImage.setImageURI(Uri.parse("android.resource://${activity?.packageName}/drawable/$weatherIcon"))
+                    binding.weatherImageOutLine.setImageURI(Uri.parse("android.resource://${activity?.packageName}/drawable/$weatherIcon"))
+                    binding.weatherDescription.text = weatherDescription
+
+                    forecastWeatherViewModel()
+                }
+            })
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -174,6 +181,12 @@ class WeatherFragment : Fragment() {
         val swipeRefreshLayout = binding.swipeRefresh
         swipeRefreshLayout.setOnRefreshListener {
             isOnline(requireContext())
+            if(binding.loadScene.alpha == 1f && !NoInternet.noInternet) {
+                currentWeatherViewModel()
+                Handler().postDelayed({
+                        animation()
+                }, 2000)
+            }
             if (!NoInternet.noInternet) {
                 viewModel.updateData()
                 noInternet()
@@ -229,13 +242,9 @@ class WeatherFragment : Fragment() {
 
     private fun noInternet() {
         if(!NoInternet.noInternet) {
-            binding.apply {
-                errorText.visibility = View.INVISIBLE
-            }
+            binding.errorText.visibility = View.INVISIBLE
         } else {
-            binding.apply {
-                errorText.visibility = View.VISIBLE
-            }
+            binding.errorText.visibility = View.VISIBLE
         }
     }
 
