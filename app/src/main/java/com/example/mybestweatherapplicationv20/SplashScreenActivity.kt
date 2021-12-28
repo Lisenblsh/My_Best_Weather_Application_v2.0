@@ -20,16 +20,14 @@ class SplashScreenActivity : AppCompatActivity() {
         GetCity().execute()
     }
 
-    fun start(){
-        Handler().postDelayed({
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-            finish()
-        }, 1000)
+    fun start() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     @SuppressLint("StaticFieldLeak")
-    inner class GetCity: AsyncTask<String, Void, String>() {
+    inner class GetCity : AsyncTask<String, Void, String>() {
         override fun doInBackground(vararg p0: String?): String? {
             val response = try {
                 URL("http://ipwhois.app/json/?lang=ru")
@@ -43,11 +41,11 @@ class SplashScreenActivity : AppCompatActivity() {
 
         override fun onPostExecute(result: String?) {
             super.onPostExecute(result)
-            try{
+            try {
                 val json = JSONObject(result).getString("city")
                 Constrains.city = json
                 start()
-            }catch (e: Exception) {
+            } catch (e: Exception) {
                 findViewById<TextView>(R.id.errorText).visibility = View.VISIBLE
             }
 
